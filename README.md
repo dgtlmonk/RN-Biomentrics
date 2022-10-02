@@ -3,4 +3,4 @@
 Biometrics test 
 
 - [x] iOS (Face ID)
-- [x] Android
+- [ ] Android
