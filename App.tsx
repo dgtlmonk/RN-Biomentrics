@@ -21,13 +21,7 @@ import {
   View,
 } from 'react-native';
 
-import {
-  Colors,
-  DebugInstructions,
-  Header,
-  LearnMoreLinks,
-  ReloadInstructions,
-} from 'react-native/Libraries/NewAppScreen';
+import {Colors} from 'react-native/Libraries/NewAppScreen';
 
 const Section: React.FC<
   PropsWithChildren<{
@@ -66,7 +60,7 @@ const App = () => {
     backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
   };
 
-  async function bio() {
+  async function bioCheck() {
     const rnBiometrics = new ReactNativeBiometrics();
 
     const {biometryType} = await rnBiometrics.isSensorAvailable();
@@ -75,15 +69,46 @@ const App = () => {
 
     if (biometryType === BiometryTypes.FaceID) {
       //do something face id specific
-      console.log(' with biometrics');
+      console.log(' with biometrics sup');
+      rnBiometrics.createKeys().then(resultObject => {
+        const {publicKey} = resultObject;
+        console.log(publicKey);
+        // sendPublicKeyToServer(publicKey);
+      });
+
+      // rnBiometrics.biometricKeysExist().then(resultObject => {
+      //   const {keysExist} = resultObject;
+
+      //   if (keysExist) {
+      //     console.log('Keys exist', keysExist);
+      //   } else {
+      //     console.log('Keys do not exist or were deleted');
+      //   }
+      // });
+
+      rnBiometrics
+        .simplePrompt({promptMessage: 'Confirm fingerprint'})
+        .then(resultObject => {
+          const {success} = resultObject;
+
+          if (success) {
+            console.log('successful biometrics provided');
+          } else {
+            console.log('user cancelled biometric prompt');
+          }
+        })
+        .catch(() => {
+          console.log('biometrics failed');
+        });
     } else {
       console.log(' no biometrics');
     }
   }
 
   useEffect(() => {
-    bio();
+    bioCheck();
   }, []);
+
   return (
     <SafeAreaView style={backgroundStyle}>
       <StatusBar
@@ -93,25 +118,11 @@ const App = () => {
       <ScrollView
         contentInsetAdjustmentBehavior="automatic"
         style={backgroundStyle}>
-        <Header />
         <View
           style={{
             backgroundColor: isDarkMode ? Colors.black : Colors.white,
           }}>
-          <Section title="Step Juan">
-            Edit <Text style={styles.highlight}>App.tsx</Text> to change this
-            screen and then come back to see your edits.
-          </Section>
-          <Section title="See Your Changes">
-            <ReloadInstructions />
-          </Section>
-          <Section title="Debug">
-            <DebugInstructions />
-          </Section>
-          <Section title="Learn More">
-            Read the docs to discover what to do next:
-          </Section>
-          <LearnMoreLinks />
+          <Section title="Biometrics">Biometrics prompt test</Section>
         </View>
       </ScrollView>
     </SafeAreaView>
